@@ -14,15 +14,17 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Steps (possibly)
 
+0.  Peak identification. Megan Feddern writes in the README for NACHO-PostProcessing that HEEL identified peaks manually.
 1.  Blank correction (?)
-2.  Correlation of reference to measured $\delta$15N. Not sure how to do this though, since derivatization changes it. So maybe the drift correction step takes this place.
+2.  Correlation of reference to measured $\delta$ 15N. Not sure how to do this though, since derivatization changes it. So maybe the drift correction step takes this place.
 3.  Do your little drift correction
+    1.  I'm going to make a separate file of $\delta$ 15N values that were obtained from standards prepared on 9/5/23
 4.  QA/QC measures? (can maybe use some of the steps from @welicky2021)
     1.  @feddern2022 includes in the supp info a table of mean standard deviation (so over multiple runs) for each AA
-    2. @welicky2021 had a table of mean, median, and max stdev
+    2.  @welicky2021 had a table of mean, median, and max stdev
 
 # Notes from other references
 
-1.  @ohkouchi2017 "Detection limits to achieve this level of precision and accuracy depend on various factors, but they are highly correlated with the signal/noise ratio of the GC-IRMS chromatogram" 
+1.  @ohkouchi2017 "Detection limits to achieve this level of precision and accuracy depend on various factors, but they are highly correlated with the signal/noise ratio of the GC-IRMS chromatogram"
 
 # References
