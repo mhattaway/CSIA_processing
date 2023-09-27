@@ -7,7 +7,10 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-lapply(c('tidyverse','kableExtra','readxl'),library,character.only = TRUE )
+library(tidyverse)
+library(readxl)
+library(kableExtra)
+library(magrittr)
 ```
 
 ```{r Load standard values, include=FALSE}
@@ -22,28 +25,43 @@ standard_values = read.csv("standards_batch1_20230905.csv")
 col_names<- c("FileHeader..Filename","Time","Seq.Run.ID","Seq.Identifier.1","Seq.Identifier.2","Seq.Line","Area All","Rt","d15N","Ampl_28","Ampl_29","AAID")
 
 data<-read_excel("dummy_CSIA_data.xlsx")%>%
-  set_colnames(col_names)
+  set_colnames(col_names)%>%
+  filter(!is.na(AAID))
 
 data_11STD<-subset(data,str_detect(`Seq.Identifier.1`,"11AA"))
 ```
 
 ```{r Fit lm for 12AA standards, include=FALSE}
-AA_list<-unique()
-standard_df<-data.frame(AA = AA_list, 
+AA_list<-unique(data_11STD$AAID)
+standard_df<-data.frame(AAID = AA_list, 
                         Intercept=rep(NA,length(AA_list)),
                         Slope = rep(NA,length(AA_list))) #initiate a dataframe for the intercepts of the linear model
 for(i in 1:length(AA_list)){
-    data <- subset(data.1STD, AAID==AA_list[i])
-    Intercept[i,1]<- coef(summary(lm(as.numeric(d15N)~as.numeric(Analysis), data=data)))[1,1]
+    aa_data <- subset(data_11STD, AAID==AA_list[i])
+    standard_df$Intercept[i]<- coef(lm(d15N~Seq.Line, data=aa_data))[1]
+    standard_df$Slope[i]<- coef(lm(d15N~Seq.Line, data=aa_data))[2]
   }
-Intercept #intercept values looped by aa
 
+```
+```{r Graph standard drift across run, echo=FALSE}
+data_11STD%>%
+  select(c("AAID","Seq.Line","d15N"))%>%
+  ggplot(aes(x = Seq.Line,y = d15N))+
+  geom_point()+
+  geom_abline(data = standard_df,aes(intercept = Intercept,slope = Slope))+
+  facet_wrap(~AAID)
 
-Slope<-data.frame(Slope=rep(NA,length(AA))) #initiate a dataframe for the slopes of the linear model
-for(i in 1:length(AA)){
-  data <- subset(data.1STD, AAID==AA[i])
-  Slope[i,1]<- coef(summary(lm(as.numeric(d15N)~as.numeric(Analysis), data=data)))[2,1]
-}
-Slope#slope values looped by aa
+```
 
+```{r Calculate difference and apply drift correction, include=FALSE}
+data<-data%>%
+  full_join(standard_df,by = "AAID")%>%
+  full_join(standard_values, by = "AAID")%>%
+  filter(!is.na(Mean_d15N))%>%
+  mutate(modeled_difference = Mean_d15N-(Intercept+Seq.Line*Slope))%>%
+  mutate(d15N_drift_adj = d15N+modeled_difference)
+```
+
+```{r Triplicate consolidation, include=FALSE}
+#just do groupby
 ```
