@@ -7,24 +7,43 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+lapply(c('tidyverse','kableExtra','readxl'),library,character.only = TRUE )
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r Load standard values, include=FALSE}
+standard_values = read.csv("standards_batch1_20230905.csv")
 ```
 
-## Including Plots
+```{r Load data file, include=FALSE}
+#NB: need to make a column called "AAID", which will be how you manually identify the AA
+#NB: In Seq.Identifier.1, use the code "11AA" to indicate the 11 amino acid standard mix
 
-You can also embed plots, for example:
+# This may need to change based on what the output file ultimately looks like
+col_names<- c("FileHeader..Filename","Time","Seq.Run.ID","Seq.Identifier.1","Seq.Identifier.2","Seq.Line","Area All","Rt","d15N","Ampl_28","Ampl_29","AAID")
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+data<-read_excel("dummy_CSIA_data.xlsx")%>%
+  set_colnames(col_names)
+
+data_11STD<-subset(data,str_detect(`Seq.Identifier.1`,"11AA"))
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r Fit lm for 12AA standards, include=FALSE}
+AA_list<-unique()
+standard_df<-data.frame(AA = AA_list, 
+                        Intercept=rep(NA,length(AA_list)),
+                        Slope = rep(NA,length(AA_list))) #initiate a dataframe for the intercepts of the linear model
+for(i in 1:length(AA_list)){
+    data <- subset(data.1STD, AAID==AA_list[i])
+    Intercept[i,1]<- coef(summary(lm(as.numeric(d15N)~as.numeric(Analysis), data=data)))[1,1]
+  }
+Intercept #intercept values looped by aa
+
+
+Slope<-data.frame(Slope=rep(NA,length(AA))) #initiate a dataframe for the slopes of the linear model
+for(i in 1:length(AA)){
+  data <- subset(data.1STD, AAID==AA[i])
+  Slope[i,1]<- coef(summary(lm(as.numeric(d15N)~as.numeric(Analysis), data=data)))[2,1]
+}
+Slope#slope values looped by aa
+
+```
