@@ -4,9 +4,9 @@ Phenylalanine,PHE,-0.3,0.2
 Proline,PRO,-6.61,0.08
 Serine,SER,-1.41,0.16
 Valine,VAL,-1.1,0.05
-Alanine,ALA,,
-Glutamic acid,GLU,,
-Glycine,GLY,,
-Leucine,LEU,,
-Methionine,MET,,
-Aspartic acid,ASP,,
+Alanine,ALA,-0.91,0.04
+Glutamic acid,GLU,-4.24,0.2
+Glycine,GLY,1.15,0.04
+Leucine,LEU,10.06,0.14
+Methionine,MET,-0.18,0.16
+Aspartic acid,ASP,-4.93,0.08
